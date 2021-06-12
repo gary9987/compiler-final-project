@@ -1,0 +1,9 @@
+START testP
+Decalre I, Integer
+Decalre J, Integer_array,100
+Decalre k, Integer_array,20
+Decalre A, Float
+Decalre B, Float
+Decalre C, Float
+Decalre D, Float
+Decalre LLL, Float_array,100
