@@ -54,9 +54,27 @@ extern int yydebug;
     END = 260,
     DECLARE = 261,
     AS = 262,
-    TYPE = 263,
-    VarName = 264,
-    NUMBER = 265
+    IF = 263,
+    THEN = 264,
+    ELSE = 265,
+    ENDIF = 266,
+    Assign_Op = 267,
+    PRINT = 268,
+    WHILE = 269,
+    ENDWHILE = 270,
+    FOR = 271,
+    TO = 272,
+    ENDFOR = 273,
+    L_OP = 274,
+    LE_OP = 275,
+    EQ_OP = 276,
+    NE_OP = 277,
+    S_OP = 278,
+    SE_OP = 279,
+    VarName = 280,
+    TYPE = 281,
+    NUMBER = 282,
+    FNUMBER = 283
   };
 #endif
 /* Tokens.  */
@@ -65,9 +83,27 @@ extern int yydebug;
 #define END 260
 #define DECLARE 261
 #define AS 262
-#define TYPE 263
-#define VarName 264
-#define NUMBER 265
+#define IF 263
+#define THEN 264
+#define ELSE 265
+#define ENDIF 266
+#define Assign_Op 267
+#define PRINT 268
+#define WHILE 269
+#define ENDWHILE 270
+#define FOR 271
+#define TO 272
+#define ENDFOR 273
+#define L_OP 274
+#define LE_OP 275
+#define EQ_OP 276
+#define NE_OP 277
+#define S_OP 278
+#define SE_OP 279
+#define VarName 280
+#define TYPE 281
+#define NUMBER 282
+#define FNUMBER 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -80,7 +116,7 @@ union YYSTYPE
 	char* str;
 	int type;
 
-#line 84 "y.tab.h"
+#line 120 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
