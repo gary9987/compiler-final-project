@@ -1,18 +1,19 @@
 %union{
 	float f;
 	int dec;
-	char* str;
+	char str[100];
 	int type;
 	struct symtab *symp;
 }
 
 %token PROGRAM Begin END DECLARE AS IF THEN ELSE ENDIF Assign_Op PRINT WHILE ENDWHILE FOR TO ENDFOR
 %token L_OP LE_OP EQ_OP NE_OP S_OP SE_OP
-%token <symp> VarName
+%token <str> VarName
 %token <type> TYPE
 %token <dec> NUMBER
 %token <f> FNUMBER
-%type <f> E T F 
+%type <f> E T F Expr
+
 
 %{	
 	#define MAX_LENGTH 100
@@ -27,18 +28,19 @@
 	void declare(char* buf, int type);
 	void inserVarName(char *name);
 	void yyerror(char *msg);
+	void assignToASM(char *name, float value);
 
 %}
 
 %%
-Start: PROGRAM VarName {fprintf(fp,"START %s\n", $2->name);} Begin Stmt_List END
+Start: PROGRAM VarName {fprintf(fp,"START %s\n", $2);} Begin Stmt_List END {printSym();}
 	 ; 
 
 Stmt_List: Stmt
 		 | Stmt_List Stmt 
 		 ;
 
-Stmt: DECLARE VarList AS TYPE ';'	{	printf("Match DECLARE VarList AS TYPE\n"); declare(buf, $4); fprintf(fp, "%s", buf); }
+Stmt: DECLARE_Stmt
 	| IF_Stmt {printf("Match IF_Stmt\n");}
 	| WHILE_Stmt
 	| FOR_Stmt
@@ -46,7 +48,11 @@ Stmt: DECLARE VarList AS TYPE ';'	{	printf("Match DECLARE VarList AS TYPE\n"); d
 	| Assign_Stmt {printf("Match Assign_Stmt\n");}
 	;
 
-VarList: VarName				{	printf("Match VarName\n"); inserVarName($1); } 
+
+DECLARE_Stmt: DECLARE VarList AS TYPE ';'	{	 declare(buf, $4); fprintf(fp, "%s", buf); printf("Match %s AS %d\n", buf, $4); printSym();}
+			;
+
+VarList: VarName				{	printf("Match VarName\n"); inserVarName($1);} 
 	   | VarList ',' VarName    {	printf("VarList , VarName\n"); inserVarName($3); } 
 	   ;
 
@@ -57,14 +63,14 @@ E: E '+' T	{$$ = $1 + $3;}
  | T	{$$ = $1;}
  ;
 T: T '*' T	{$$ = $1 * $3;}
- | T '/' T	{$$ = $1 / $3;}
+ | T '/' T	{ if($3==0){yyerror("devide by zero\n");} $$ = $1 / $3;}
  | F	{$$ = $1;}
  ;
 F: '(' E ')'	{$$ = $2;}
  | '-' F	{$$ = -$2;}
  | NUMBER	{$$ = $1;}
  | FNUMBER	{$$ = $1;}
- | VarName
+ | VarName	{$$ = getValue($1); }
  ;
 
 PRINT_Stmt: PRINT '(' PRINT_List ')' ';'
@@ -73,7 +79,7 @@ PRINT_List: Expr {printf("print_list expr\n");}
 	      | PRINT_List ',' Expr
 		  ;
 
-Assign_Stmt: VarName Assign_Op Expr ';'
+Assign_Stmt: VarName Assign_Op Expr ';' { printf("%s %f\n", $1, $3); assignSym($1, $3); assignToASM($1, $3); }
 		   ;
 Condition: Expr ConOp Expr	{printf("Match Condition\n");}
 		 ;
@@ -99,10 +105,13 @@ FOR_Stmt: FOR '(' VarName Assign_Op NUMBER TO NUMBER ')' Stmt_List ENDFOR	{print
 #include <stdbool.h>
 
 int main(){
+
+	memset(symtab, 0, sizeof(symtab));
 	fp = fopen("asm.txt", "w");
 	yyparse();
 	fclose(fp);
 	return 0;
+
 }
 
 bool isVarArray(char* var){
@@ -149,6 +158,8 @@ void declare(char* buf, int type){
 			}
 			
 			strcat(buf, var_name[i]);
+			insertSym(var_name[i], type);
+
 			strcat(buf, ", ");
 			
 		}
@@ -174,22 +185,13 @@ void inserVarName(char *name){
 		}
 	}
 }
-void yyerror(char *msg){
-	fprintf(stderr, "%s\n", msg);
-	exit(1);
-}
 
-int lookSym(char *s){
-	for(int i=0; i<NSYMS; ++i){
-		// found
-		if(symtab[i]-> name && !strcmp(symtab[i]-> name, s)){
-			return i;
-		}
-		// free
-		if( ! symtab[i]-> name ){
-			return i;
-		}
+void assignToASM(char *name, float value){
+	int type = getType(name);
+	if(type == 1){
+		fprintf(fp, "I_STORE %s,%d\n", name, (int)value);
 	}
-	yyerror("Too many symbols");
-	exit(1);	/* cannot continue */
+	if(type == 2){
+		fprintf(fp, "F_STORE %s,%f\n", name, value);
+	}
 }

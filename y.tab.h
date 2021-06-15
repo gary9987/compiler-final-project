@@ -113,10 +113,11 @@ union YYSTYPE
 
 	float f;
 	int dec;
-	char* str;
+	char str[100];
 	int type;
+	struct symtab *symp;
 
-#line 120 "y.tab.h"
+#line 121 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

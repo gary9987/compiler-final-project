@@ -40,7 +40,7 @@ extern YYSTYPE yylval;
 [Ff][Oo][Rr]    {return FOR;}
 [Ee][Nn][Dd][Ff][Oo][Rr]    {return ENDFOR;}
 [Tt][Oo]    {return TO;}
-[A-Za-z][A-Za-z0-9]*(\[([1-9][0-9]*)?([A-Za-z][A-Za-z0-9]*)?\])*    {yylval.str = yytext; printf("Match token of VarName %s\n", yytext); return VarName;}
+[A-Za-z][A-Za-z0-9]*(\[([1-9][0-9]*)?([A-Za-z][A-Za-z0-9]*)?\])*    {strcpy(yylval.str, yytext); printf("Match token of VarName %s\n", yytext); return VarName;}
 [\n\r]
 .	return yytext[0];
 

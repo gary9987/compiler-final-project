@@ -1,1 +1,8 @@
 START testP
+Decalre I, Integer
+Decalre A, Float
+Decalre B, Float
+Decalre C, Float
+Decalre D, Float
+Decalre LLL, Float_array,100
+F_Store A,0.000000

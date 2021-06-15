@@ -971,7 +971,7 @@ YY_RULE_SETUP
 case 33:
 YY_RULE_SETUP
 #line 43 "final.l"
-{yylval.str = yytext; printf("Match token of VarName %s\n", yytext); return VarName;}
+{strcpy(yylval.str, yytext); printf("Match token of VarName %s\n", yytext); return VarName;}
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
