@@ -3,7 +3,8 @@
 	int dec;
 	char str[100];
 	int type;
-	struct symtab *symp;
+	struct symtab_struct *symp;
+	char* constchar;
 }
 
 %token PROGRAM Begin END DECLARE AS IF THEN ELSE ENDIF Assign_Op PRINT WHILE ENDWHILE FOR TO ENDFOR
@@ -11,29 +12,47 @@
 %token <str> VarName
 %token <type> TYPE
 %token <dec> NUMBER
-%token <f> FNUMBER
-%type <f> E T F Expr
-
+%token <str> FNUMBER
+%type <symp> E T F Expr
+%type <constchar> ConOp
 
 %{	
 	#define MAX_LENGTH 100
 	#include "symtab.h"
 	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <stdbool.h>
+
 	extern int yylex();
 	// ================ var ======================
 	FILE *fp;
 	char var_name[MAX_LENGTH][MAX_LENGTH] = {};
 	char buf[MAX_LENGTH];
+	int tmp_var_count = 1;
+	int label_count = 1;
+	int global_type = 1;
 	// ================ function =================
 	void declare(char* buf, int type);
 	void inserVarName(char *name);
 	void yyerror(char *msg);
-	void assignToASM(char *name, float value);
+	void assignToASM(char *name, char* value);
+	struct symtab_struct *creatTmp(int type);
+	void tmpVarToASM();
 
 %}
 
 %%
-Start: PROGRAM VarName {fprintf(fp,"START %s\n", $2);} Begin Stmt_List END {printSym();}
+Start: PROGRAM VarName 
+	   {
+		   fprintf(fp,"START %s\n", $2);
+	   } 
+	   Begin Stmt_List END 
+	   {
+		   printSym();
+		   fprintf(fp,"HALT %s\n", $2);
+		   tmpVarToASM();
+	   }
 	 ; 
 
 Stmt_List: Stmt
@@ -56,37 +75,123 @@ VarList: VarName				{	printf("Match VarName\n"); inserVarName($1);}
 	   | VarList ',' VarName    {	printf("VarList , VarName\n"); inserVarName($3); } 
 	   ;
 
-Expr: E {printf("Match Expr, %f\n", $1);}
+Expr: E {printf("Match Expr\n"); $$ = $1;}
 	;
-E: E '+' T	{$$ = $1 + $3;}
- | E '-' T	{$$ = $1 - $3;}
+
+E: E '+' T
+   {
+	   fprintf(fp, "%s_ADD %s,%s,T&%d\n", $1->type==1?"I":"F", $1->name, $3->name, tmp_var_count);
+	   $$ = creatTmp($1->type);
+   }
+ | E '-' T
+   {
+	   fprintf(fp, "%s_SUB %s,%s,T&%d\n", $1->type==1?"I":"F", $1->name, $3->name, tmp_var_count);
+	   $$ = creatTmp($1->type);
+   }
  | T	{$$ = $1;}
  ;
-T: T '*' T	{$$ = $1 * $3;}
- | T '/' T	{ if($3==0){yyerror("devide by zero\n");} $$ = $1 / $3;}
- | F	{$$ = $1;}
- ;
-F: '(' E ')'	{$$ = $2;}
- | '-' F	{$$ = -$2;}
- | NUMBER	{$$ = $1;}
- | FNUMBER	{$$ = $1;}
- | VarName	{$$ = getValue($1); }
+
+T: T '*' T
+   {
+	   fprintf(fp, "%s_MUL %s,%s,T&%d\n", $1->type==1?"I":"F", $1->name, $3->name, tmp_var_count);
+	   $$ = creatTmp($1->type);
+   }
+ | T '/' T
+   {
+	   fprintf(fp, "%s_DIV %s,%s,T&%d\n", $1->type==1?"I":"F", $1->name, $3->name, tmp_var_count);
+	   $$ = creatTmp($1->type);
+   }
+ | F
+   {
+	   $$ = $1;
+   }
  ;
 
-PRINT_Stmt: PRINT '(' PRINT_List ')' ';'
+F: '(' E ')'	
+ | '-' F
+   {
+	   fprintf(fp, "%s_UMINUS %s, T&%d\n", $2->type==1?"I":"F", $2->name, tmp_var_count);
+	   $$ = creatTmp($2->type);
+   }
+ | NUMBER
+   {
+	   struct symtab_struct *p = malloc(sizeof(symtab));
+	   p->value = $1;
+	   sprintf(p->name, "%d", (int)$1);
+	   //printf("P value %d\n", (int)(p->value));
+	   $$ = p;
+   }
+ | FNUMBER	
+   {
+	   struct symtab_struct *p = malloc(sizeof(symtab));
+	   p->value = atof($1);
+	   strcpy(p->name, $1);
+	   $$ = p;
+   }
+ | VarName
+   {	
+	   char tmp[MAX_LENGTH] = "";
+	   strcpy(tmp, $1);
+	   for(int i=0; i<strlen(tmp); ++i){
+		   if(tmp[i] == '['){
+			   tmp[i] = '\0';
+			   break;
+		   }
+	   }
+	   int orig_ind = lookSym(tmp); // without []
+	   int ind = lookSym($1);	// with []
+	   $$ = &symtab[ind];
+	   symtab[ind].type = symtab[orig_ind].type;
+	   printf("VARN %s\n", $$->name);
+   }
+ ;
+
+PRINT_Stmt: PRINT {strcpy(buf, "");} '(' PRINT_List ')' ';'
+			{
+				fprintf(fp, "CALL print,%s\n", buf);
+			}
 		  ;
-PRINT_List: Expr {printf("print_list expr\n");}
+PRINT_List: Expr
+		    {
+				strcat(buf, $1->name);
+			}
 	      | PRINT_List ',' Expr
+		    {
+				strcat(buf, ",");
+				strcat(buf, $3->name);
+			}
 		  ;
 
-Assign_Stmt: VarName Assign_Op Expr ';' { printf("%s %f\n", $1, $3); assignSym($1, $3); assignToASM($1, $3); }
+Assign_Stmt: VarName Assign_Op Expr ';' 
+			{ 
+				int ind = lookSym($1);
+				int type = symtab[ind].type;
+				fprintf(fp, "%s_STORE %s,%s\n", type==1?"I":"F", $3->name, $1);
+			}
 		   ;
 Condition: Expr ConOp Expr	{printf("Match Condition\n");}
+		   {
+			   fprintf(fp, "%s_CMP %s, %s\n", $1->type==1?"I":"F", $1->name, $3->name);
+			   fprintf(fp, "%s lb&%d\n", $2, label_count++);
+		   }
 		 ;
-ConOp: L_OP | LE_OP | EQ_OP | NE_OP | S_OP | SE_OP
+ConOp: L_OP {$$ = "JLE";}
+	 | LE_OP {$$ = "JL";}
+	 | EQ_OP {$$ = "JNE";}
+	 | NE_OP {$$ = "JE";}
+	 | S_OP {$$ = "JGE";}
+	 | SE_OP {$$ = "JG";}
 	 ;
 
-IF_Stmt: IF '(' Condition ')' THEN Stmt_List ELSE_Stmt ENDIF
+IF_Stmt: IF '(' Condition ')' THEN Stmt_List 
+         {
+			fprintf(fp, "J lb&%d\n", label_count+1);
+			fprintf(fp, "lb&%d:	", label_count-1);
+		 }
+		 ELSE_Stmt ENDIF
+		 {
+			fprintf(fp, "lb&%d:	", label_count);
+		 }
 	   ;
 ELSE_Stmt: ELSE Stmt_List	{printf("Match ELSE_Stmt\n");}
 		 |
@@ -95,14 +200,21 @@ ELSE_Stmt: ELSE Stmt_List	{printf("Match ELSE_Stmt\n");}
 WHILE_Stmt: WHILE '(' Condition ')' Stmt_List ENDWHILE	{printf("Match WHILE\n");}
 	      ;
 
-FOR_Stmt: FOR '(' VarName Assign_Op NUMBER TO NUMBER ')' Stmt_List ENDFOR	{printf("Match FOR\n");}
+FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
+		  {	
+			  fprintf(fp, "I_STORE %d,%s\n", (int)($5->value), $3);
+			  fprintf(fp, "lb&%d:	", label_count);
+		  } 
+		  Stmt_List ENDFOR	
+		  {
+			  fprintf(fp, "INC %s\n", $3);
+			  fprintf(fp, "I_CMP %s,%d\n", $3, (int)($7->value));
+			  fprintf(fp, "JL lb&%d\n", label_count);
+			  label_count++;
+		  }
 		;
 %%
 
-#include <stdlib.h> 
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
 
 int main(){
 
@@ -186,12 +298,21 @@ void inserVarName(char *name){
 	}
 }
 
-void assignToASM(char *name, float value){
-	int type = getType(name);
-	if(type == 1){
-		fprintf(fp, "I_STORE %s,%d\n", name, (int)value);
-	}
-	if(type == 2){
-		fprintf(fp, "F_STORE %s,%f\n", name, value);
+
+
+struct symtab_struct *creatTmp(int type){
+	char tname[MAX_LENGTH] = {};
+	sprintf(tname, "T&%d", tmp_var_count++);
+	//inserVarName(tname);
+	int ind = lookSym(tname);
+	symtab[ind].type = type;
+	return &symtab[ind];
+}
+
+void tmpVarToASM(){
+	for(int i=0; i<NSYMS; ++i){
+		if(symtab[i].name[0] == 'T' && symtab[i].name[1] == '&'){
+			fprintf(fp, "Declare %s, %s\n", symtab[i].name, symtab[i].type==1?"Integer":"Float");
+		}
 	}
 }

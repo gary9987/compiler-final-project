@@ -816,7 +816,7 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 11 "final.l"
-{ yylval.f = atof(yytext); printf("Match token of FNUMBER %f\n", yylval.f); return FNUMBER; }
+{ strcpy(yylval.str, yytext); printf("Match token of FNUMBER %f\n", yylval.f); return FNUMBER; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP

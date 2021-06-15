@@ -18,12 +18,10 @@ int lookSym(char *s){
 		}
 		// free
 		if( !strcmp(symtab[i].name, "") ){
+            strcpy(symtab[i].name, s);
 			return i;
 		}
 	}
-    //printf("%s", s);
-	yyerror("Too many symbols");
-	exit(1);	/* cannot continue */
 }
 
 void insertSym(char *name, int type){
@@ -37,13 +35,9 @@ void printSym(){
     for(int i=0; i<NSYMS; ++i){
 		// found
 		if(strcmp(symtab[i].name, "")){
-            //int
-            if(symtab[i].type == 1)
-			    printf("Var: %s, Value: %f, Type1: %d\n", symtab[i].name, symtab[i].value, symtab[i].type);
-            // double
-            if(symtab[i].type == 2)
-			    printf("Var: %s, Value: %f, Type2: %d\n", symtab[i].name, symtab[i].value, symtab[i].type);
+			printf("Var: %s, Type: %d\n", symtab[i].name, symtab[i].type);
 		}
+
 	}
 }
 

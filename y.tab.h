@@ -115,9 +115,10 @@ union YYSTYPE
 	int dec;
 	char str[100];
 	int type;
-	struct symtab *symp;
+	struct symtab_struct *symp;
+	char* constchar;
 
-#line 121 "y.tab.h"
+#line 122 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

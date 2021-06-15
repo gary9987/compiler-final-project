@@ -8,7 +8,7 @@ extern YYSTYPE yylval;
 %%
 
 \%\%.*
-[0-9]+(\.[0-9]+) { yylval.f = atof(yytext); printf("Match token of FNUMBER %f\n", yylval.f); return FNUMBER; }
+[0-9]+(\.[0-9]+) { strcpy(yylval.str, yytext); printf("Match token of FNUMBER %f\n", yylval.f); return FNUMBER; }
 [0-9]+	{ yylval.dec = atoi(yytext); printf("Match token of NUMBER %d\n", yylval.dec); return NUMBER; }
 [ \t]	;		/* ignore white space */
 "+"      {   printf("Match token of +\n"); return yytext[0];}

@@ -10,7 +10,7 @@ Begin
    ENDFOR
 
    IF (A>=10000.0) THEN
-      print(1);
+      print(A+3.14);
    ELSE
       print(2,1.4);
    ENDIF
