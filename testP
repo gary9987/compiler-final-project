@@ -15,4 +15,10 @@ Begin
       print(2,1.4);
    ENDIF
    
+   I:=1;
+   WHILE (I<=100)
+      A:=-LLL[I]+B*D-C;
+      I:=I+1;
+   ENDWHILE
+
 End

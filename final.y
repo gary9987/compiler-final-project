@@ -172,7 +172,7 @@ Assign_Stmt: VarName Assign_Op Expr ';'
 Condition: Expr ConOp Expr	{printf("Match Condition\n");}
 		   {
 			   fprintf(fp, "%s_CMP %s, %s\n", $1->type==1?"I":"F", $1->name, $3->name);
-			   fprintf(fp, "%s lb&%d\n", $2, label_count++);
+			   fprintf(fp, "%s lb&%d\n", $2, label_count);
 		   }
 		 ;
 ConOp: L_OP {$$ = "JLE";}
@@ -186,18 +186,27 @@ ConOp: L_OP {$$ = "JLE";}
 IF_Stmt: IF '(' Condition ')' THEN Stmt_List 
          {
 			fprintf(fp, "J lb&%d\n", label_count+1);
-			fprintf(fp, "lb&%d:	", label_count-1);
+			fprintf(fp, "lb&%d:	", label_count++);
 		 }
 		 ELSE_Stmt ENDIF
 		 {
-			fprintf(fp, "lb&%d:	", label_count);
+			fprintf(fp, "lb&%d:	", label_count++);
 		 }
 	   ;
 ELSE_Stmt: ELSE Stmt_List	{printf("Match ELSE_Stmt\n");}
 		 |
 		 ;
 
-WHILE_Stmt: WHILE '(' Condition ')' Stmt_List ENDWHILE	{printf("Match WHILE\n");}
+WHILE_Stmt: WHILE 
+			{
+				fprintf(fp, "lb&%d:	", label_count++);
+			}
+			'(' Condition ')' Stmt_List ENDWHILE	
+			{
+				fprintf(fp, "J lb&%d\n", label_count-1);
+				fprintf(fp, "lb&%d:	", label_count++);
+				printf("Match WHILE\n");
+			}
 	      ;
 
 FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
