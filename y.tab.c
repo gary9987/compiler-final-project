@@ -1699,7 +1699,7 @@ yyreduce:
   case 40:
 #line 187 "final.y"
          {
-			fprintf(fp, "J lb&%d\n", label_count+1);
+			fprintf(fp, "J lb&%d\n", label_count);
 			fprintf(fp, "lb&%d:	", label_count++);
 		 }
 #line 1706 "y.tab.c"
@@ -1741,7 +1741,7 @@ yyreduce:
 #line 213 "final.y"
                   {	
 			  fprintf(fp, "I_STORE %d,%s\n", (int)((yyvsp[-3].symp)->value), (yyvsp[-5].str));
-			  fprintf(fp, "lb&%d:	", label_count);
+			  fprintf(fp, "lb&%d:	", label_count++);
 		  }
 #line 1747 "y.tab.c"
     break;
@@ -1751,14 +1751,13 @@ yyreduce:
                   {
 			  fprintf(fp, "INC %s\n", (yyvsp[-8].str));
 			  fprintf(fp, "I_CMP %s,%d\n", (yyvsp[-8].str), (int)((yyvsp[-4].symp)->value));
-			  fprintf(fp, "JL lb&%d\n", label_count);
-			  label_count++;
+			  fprintf(fp, "JL lb&%d\n", label_count-1);
 		  }
-#line 1758 "y.tab.c"
+#line 1757 "y.tab.c"
     break;
 
 
-#line 1762 "y.tab.c"
+#line 1761 "y.tab.c"
 
       default: break;
     }
@@ -1990,7 +1989,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 225 "final.y"
+#line 224 "final.y"
 
 
 

@@ -185,7 +185,7 @@ ConOp: L_OP {$$ = "JLE";}
 
 IF_Stmt: IF '(' Condition ')' THEN Stmt_List 
          {
-			fprintf(fp, "J lb&%d\n", label_count+1);
+			fprintf(fp, "J lb&%d\n", label_count);
 			fprintf(fp, "lb&%d:	", label_count++);
 		 }
 		 ELSE_Stmt ENDIF
@@ -212,14 +212,13 @@ WHILE_Stmt: WHILE
 FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
 		  {	
 			  fprintf(fp, "I_STORE %d,%s\n", (int)($5->value), $3);
-			  fprintf(fp, "lb&%d:	", label_count);
+			  fprintf(fp, "lb&%d:	", label_count++);
 		  } 
 		  Stmt_List ENDFOR	
 		  {
 			  fprintf(fp, "INC %s\n", $3);
 			  fprintf(fp, "I_CMP %s,%d\n", $3, (int)($7->value));
-			  fprintf(fp, "JL lb&%d\n", label_count);
-			  label_count++;
+			  fprintf(fp, "JL lb&%d\n", label_count-1);
 		  }
 		;
 %%

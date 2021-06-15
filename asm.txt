@@ -18,27 +18,11 @@ F_CMP A, 10000.0
 JL lb&2
 F_ADD A,3.14,T&5
 CALL print,T&5
-J lb&3
+J lb&2
 lb&2:	CALL print,2,1.4
-lb&3:	I_STORE 1,I
-lb&4:	I_CMP I, 100
-JG lb&5
-F_UMINUS LLL[I], T&6
-F_MUL B,D,T&7
-F_ADD T&6,T&7,T&8
-F_SUB T&8,C,T&9
-F_STORE T&9,A
-I_ADD I,1,T&10
-I_STORE T&10,I
-J lb&4
-lb&5:	HALT testP
+lb&3:	HALT testP
 Declare T&1, Float
 Declare T&2, Float
 Declare T&3, Float
 Declare T&4, Float
 Declare T&5, Float
-Declare T&6, Float
-Declare T&7, Float
-Declare T&8, Float
-Declare T&9, Float
-Declare T&10, Integer
