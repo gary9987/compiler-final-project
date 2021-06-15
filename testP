@@ -1,11 +1,18 @@
 %%the beginning of an test data for Micro/Ex
-
 Program testP
 
 Begin
+   declare I as integer;
+   declare A,B,C,D, LLL[100] as float;
 
- declare I, J[100], k[20] as integer;
+   FOR (I:=1 TO 100)
+      A:=-LLL[I]+B*D-C;
+   ENDFOR
 
- declare A,B,C,D, LLL[100] as float;
-
+   IF (A>=10000.0) THEN
+      print(A+3.14);
+   ELSE
+      print(2,1.4);
+   ENDIF
+   
 End
