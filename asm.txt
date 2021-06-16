@@ -1,36 +1,30 @@
 START testP
 Decalre I, Integer
+Decalre J, Integer
 Decalre A, Float
 Decalre B, Float
 Decalre C, Float
 Decalre D, Float
 Decalre LLL, Float_array,100
-F_MUL 2,J,T&1
-F_SUB T&1,4,T&2
-F_MUL 100,J,T&3
-F_ADD T&3,6,T&4
+I_MUL 2,J,T&1
+I_SUB T&1,4,T&2
+I_MUL 100,J,T&3
+I_ADD T&3,6,T&4
 I_STORE T&2,I
 lb&1:	F_UMINUS LLL[I], T&5
 F_MUL B,D,T&6
 F_ADD T&5,T&6,T&7
 F_SUB T&7,C,T&8
 F_STORE T&8,A
-INC I
+DEC I
 I_CMP I,T&4
 JL lb&1
-I_STORE 0,I
-lb&2:	I_CMP I, 100
-JG lb&3
-F_ADD 1,1,T&9
-I_STORE T&9,I
-J lb&2
-lb&3:	HALT testP
-Declare T&1, Float
-Declare T&2, Float
-Declare T&3, Float
-Declare T&4, Float
+HALT testP
+Declare T&1, Integer
+Declare T&2, Integer
+Declare T&3, Integer
+Declare T&4, Integer
 Declare T&5, Float
 Declare T&6, Float
 Declare T&7, Float
 Declare T&8, Float
-Declare T&9, Float

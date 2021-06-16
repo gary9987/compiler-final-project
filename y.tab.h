@@ -65,16 +65,18 @@ extern int yydebug;
     FOR = 271,
     TO = 272,
     ENDFOR = 273,
-    L_OP = 274,
-    LE_OP = 275,
-    EQ_OP = 276,
-    NE_OP = 277,
-    S_OP = 278,
-    SE_OP = 279,
-    VarName = 280,
-    TYPE = 281,
-    NUMBER = 282,
-    FNUMBER = 283
+    STEP = 274,
+    DOWNTO = 275,
+    L_OP = 276,
+    LE_OP = 277,
+    EQ_OP = 278,
+    NE_OP = 279,
+    S_OP = 280,
+    SE_OP = 281,
+    VarName = 282,
+    TYPE = 283,
+    NUMBER = 284,
+    FNUMBER = 285
   };
 #endif
 /* Tokens.  */
@@ -94,16 +96,18 @@ extern int yydebug;
 #define FOR 271
 #define TO 272
 #define ENDFOR 273
-#define L_OP 274
-#define LE_OP 275
-#define EQ_OP 276
-#define NE_OP 277
-#define S_OP 278
-#define SE_OP 279
-#define VarName 280
-#define TYPE 281
-#define NUMBER 282
-#define FNUMBER 283
+#define STEP 274
+#define DOWNTO 275
+#define L_OP 276
+#define LE_OP 277
+#define EQ_OP 278
+#define NE_OP 279
+#define S_OP 280
+#define SE_OP 281
+#define VarName 282
+#define TYPE 283
+#define NUMBER 284
+#define FNUMBER 285
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -118,7 +122,7 @@ union YYSTYPE
 	struct symtab_struct *symp;
 	char* constchar;
 
-#line 122 "y.tab.h"
+#line 126 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -4,17 +4,11 @@ Program testP
 
 Begin
 
- declare I as integer;
+ declare I,J as integer;
  declare A,B,C,D, LLL[100] as float;
 
- 
-FOR (I:=2*J-4 TO 100*J+6)
-    A:=-LLL[I]+B*D-C;
-ENDFOR
+ FOR (I:=2*J-4 DOWNTO 100*J+6)
+  A:=-LLL[I]+B*D-C;
+ ENDFOR
 
-I := 0;
-WHILE (I<=100)
-    I:=1+1;
-ENDWHILE
-
-END
+End

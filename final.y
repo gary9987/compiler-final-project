@@ -7,14 +7,14 @@
 	char* constchar;
 }
 
-%token PROGRAM Begin END DECLARE AS IF THEN ELSE ENDIF Assign_Op PRINT WHILE ENDWHILE FOR TO ENDFOR
+%token PROGRAM Begin END DECLARE AS IF THEN ELSE ENDIF Assign_Op PRINT WHILE ENDWHILE FOR TO ENDFOR STEP DOWNTO
 %token L_OP LE_OP EQ_OP NE_OP S_OP SE_OP
 %token <str> VarName
 %token <type> TYPE
 %token <dec> NUMBER
 %token <str> FNUMBER
 %type <symp> E T F Expr
-%type <constchar> ConOp
+%type <constchar> ConOp FOR_Step FOR_To
 
 %{	
 	#define MAX_LENGTH 100
@@ -118,6 +118,7 @@ F: '(' E ')'
    {
 	   struct symtab_struct *p = malloc(sizeof(symtab));
 	   p->value = $1;
+	   p->type = 1;
 	   sprintf(p->name, "%d", (int)$1);
 	   $$ = p;
    }
@@ -125,6 +126,7 @@ F: '(' E ')'
    {
 	   struct symtab_struct *p = malloc(sizeof(symtab));
 	   p->value = atof($1);
+	   p->type = 2;
 	   strcpy(p->name, $1);
 	   $$ = p;
    }
@@ -212,7 +214,7 @@ WHILE_Stmt: WHILE
 			}
 	      ;
 
-FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
+FOR_Stmt: FOR '(' VarName Assign_Op Expr FOR_To Expr FOR_Step')' 
 		  {	
 			  fprintf(fp, "I_STORE %s,%s\n", ($5->name), $3);
 			  push(&for_stack, label_count);
@@ -220,11 +222,26 @@ FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')'
 		  } 
 		  Stmt_List ENDFOR	
 		  {
-			  fprintf(fp, "INC %s\n", $3);
+			  if(!strcmp($8, "1")){
+				  fprintf(fp, "%s %s\n", !strcmp($6, "TO")?"INC":"DEC", $3);	
+			  }
+			  else{
+				  struct symtab_struct *p = creatTmp(1);
+				  fprintf(fp, "%s %s,%s,%s\n", !strcmp($6, "TO")?"I_ADD":"I_SUB", $3, $8, p->name);
+				  fprintf(fp, "I_STORE %s,%s\n", p->name, $3);
+			  }
 			  fprintf(fp, "I_CMP %s,%s\n", $3, ($7->name));
 			  fprintf(fp, "JL lb&%d\n", pop(&for_stack));
 		  }
 		;
+
+FOR_Step: STEP Expr {$$ = $2->name; printf("STEP %s\n", $2->name);}
+        | {$$ = "1"; }
+		;
+
+FOR_To: TO	{$$ = "TO";}
+	  | DOWNTO	{$$ = "DOWNTO";}
+	  ;
 %%
 
 
