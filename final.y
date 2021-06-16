@@ -119,7 +119,6 @@ F: '(' E ')'
 	   struct symtab_struct *p = malloc(sizeof(symtab));
 	   p->value = $1;
 	   sprintf(p->name, "%d", (int)$1);
-	   //printf("P value %d\n", (int)(p->value));
 	   $$ = p;
    }
  | FNUMBER	
@@ -215,14 +214,14 @@ WHILE_Stmt: WHILE
 
 FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
 		  {	
-			  fprintf(fp, "I_STORE %d,%s\n", (int)($5->value), $3);
+			  fprintf(fp, "I_STORE %s,%s\n", ($5->name), $3);
 			  push(&for_stack, label_count);
 			  fprintf(fp, "lb&%d:	", label_count++);
 		  } 
 		  Stmt_List ENDFOR	
 		  {
 			  fprintf(fp, "INC %s\n", $3);
-			  fprintf(fp, "I_CMP %s,%d\n", $3, (int)($7->value));
+			  fprintf(fp, "I_CMP %s,%s\n", $3, ($7->name));
 			  fprintf(fp, "JL lb&%d\n", pop(&for_stack));
 		  }
 		;

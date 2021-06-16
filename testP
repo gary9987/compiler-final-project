@@ -8,12 +8,8 @@ Begin
  declare A,B,C,D, LLL[100] as float;
 
  
-I:=1;
-WHILE (I<=100)
-    I:=1+1;
-    WHILE (I<=100)
-        I:=1+1;
-    ENDWHILE
-ENDWHILE
+FOR (I:=2*J-4 TO 100*J+6)
+    A:=-LLL[I]+B*D-C;
+ENDFOR
 
 END

@@ -590,9 +590,9 @@ static const yytype_uint8 yyrline[] =
 {
        0,    48,    48,    47,    59,    60,    63,    64,    65,    66,
       67,    68,    72,    75,    76,    79,    82,    87,    92,    95,
-     100,   105,   111,   112,   117,   125,   132,   150,   150,   155,
-     159,   166,   173,   173,   180,   181,   182,   183,   184,   185,
-     189,   188,   199,   200,   204,   203,   217,   216
+     100,   105,   111,   112,   117,   124,   131,   149,   149,   154,
+     158,   165,   172,   172,   179,   180,   181,   182,   183,   184,
+     188,   187,   198,   199,   203,   202,   216,   215
 };
 #endif
 
@@ -1568,25 +1568,24 @@ yyreduce:
 	   struct symtab_struct *p = malloc(sizeof(symtab));
 	   p->value = (yyvsp[0].dec);
 	   sprintf(p->name, "%d", (int)(yyvsp[0].dec));
-	   //printf("P value %d\n", (int)(p->value));
 	   (yyval.symp) = p;
    }
-#line 1575 "y.tab.c"
+#line 1574 "y.tab.c"
     break;
 
   case 25:
-#line 126 "final.y"
+#line 125 "final.y"
    {
 	   struct symtab_struct *p = malloc(sizeof(symtab));
 	   p->value = atof((yyvsp[0].str));
 	   strcpy(p->name, (yyvsp[0].str));
 	   (yyval.symp) = p;
    }
-#line 1586 "y.tab.c"
+#line 1585 "y.tab.c"
     break;
 
   case 26:
-#line 133 "final.y"
+#line 132 "final.y"
    {	
 	   char tmp[MAX_LENGTH] = "";
 	   strcpy(tmp, (yyvsp[0].str));
@@ -1602,167 +1601,167 @@ yyreduce:
 	   symtab[ind].type = symtab[orig_ind].type;
 	   printf("VARN %s\n", (yyval.symp)->name);
    }
-#line 1606 "y.tab.c"
+#line 1605 "y.tab.c"
     break;
 
   case 27:
-#line 150 "final.y"
+#line 149 "final.y"
                   {strcpy(buf, "");}
-#line 1612 "y.tab.c"
+#line 1611 "y.tab.c"
     break;
 
   case 28:
-#line 151 "final.y"
+#line 150 "final.y"
                         {
 				fprintf(fp, "CALL print,%s\n", buf);
 			}
-#line 1620 "y.tab.c"
+#line 1619 "y.tab.c"
     break;
 
   case 29:
-#line 156 "final.y"
+#line 155 "final.y"
                     {
 				strcat(buf, (yyvsp[0].symp)->name);
 			}
-#line 1628 "y.tab.c"
+#line 1627 "y.tab.c"
     break;
 
   case 30:
-#line 160 "final.y"
+#line 159 "final.y"
                     {
 				strcat(buf, ",");
 				strcat(buf, (yyvsp[0].symp)->name);
 			}
-#line 1637 "y.tab.c"
+#line 1636 "y.tab.c"
     break;
 
   case 31:
-#line 167 "final.y"
+#line 166 "final.y"
                         { 
 				int ind = lookSym((yyvsp[-3].str));
 				int type = symtab[ind].type;
 				fprintf(fp, "%s_STORE %s,%s\n", type==1?"I":"F", (yyvsp[-1].symp)->name, (yyvsp[-3].str));
 			}
-#line 1647 "y.tab.c"
+#line 1646 "y.tab.c"
     break;
 
   case 32:
-#line 173 "final.y"
+#line 172 "final.y"
                                 {printf("Match Condition\n");}
-#line 1653 "y.tab.c"
+#line 1652 "y.tab.c"
     break;
 
   case 33:
-#line 174 "final.y"
+#line 173 "final.y"
                    {
 			   fprintf(fp, "%s_CMP %s, %s\n", (yyvsp[-3].symp)->type==1?"I":"F", (yyvsp[-3].symp)->name, (yyvsp[-1].symp)->name);
 			   push(&con_stack, label_count);
 			   fprintf(fp, "%s lb&%d\n", (yyvsp[-2].constchar), label_count++);
 		   }
-#line 1663 "y.tab.c"
+#line 1662 "y.tab.c"
     break;
 
   case 34:
-#line 180 "final.y"
+#line 179 "final.y"
             {(yyval.constchar) = "JLE";}
-#line 1669 "y.tab.c"
+#line 1668 "y.tab.c"
     break;
 
   case 35:
-#line 181 "final.y"
+#line 180 "final.y"
                  {(yyval.constchar) = "JL";}
-#line 1675 "y.tab.c"
+#line 1674 "y.tab.c"
     break;
 
   case 36:
-#line 182 "final.y"
+#line 181 "final.y"
                  {(yyval.constchar) = "JNE";}
-#line 1681 "y.tab.c"
+#line 1680 "y.tab.c"
     break;
 
   case 37:
-#line 183 "final.y"
+#line 182 "final.y"
                  {(yyval.constchar) = "JE";}
-#line 1687 "y.tab.c"
+#line 1686 "y.tab.c"
     break;
 
   case 38:
-#line 184 "final.y"
+#line 183 "final.y"
                 {(yyval.constchar) = "JGE";}
-#line 1693 "y.tab.c"
+#line 1692 "y.tab.c"
     break;
 
   case 39:
-#line 185 "final.y"
+#line 184 "final.y"
                  {(yyval.constchar) = "JG";}
-#line 1699 "y.tab.c"
+#line 1698 "y.tab.c"
     break;
 
   case 40:
-#line 189 "final.y"
+#line 188 "final.y"
          {
 			push(&if_stack, label_count++);
 			fprintf(fp, "J lb&%d\n", top(&if_stack));
 			fprintf(fp, "lb&%d:	", pop(&con_stack));
 		 }
-#line 1709 "y.tab.c"
+#line 1708 "y.tab.c"
     break;
 
   case 41:
-#line 195 "final.y"
+#line 194 "final.y"
                  {
 			fprintf(fp, "lb&%d:	", pop_front(&if_stack));
 		 }
-#line 1717 "y.tab.c"
+#line 1716 "y.tab.c"
     break;
 
   case 42:
-#line 199 "final.y"
+#line 198 "final.y"
                                 {printf("Match ELSE_Stmt\n");}
-#line 1723 "y.tab.c"
+#line 1722 "y.tab.c"
     break;
 
   case 44:
-#line 204 "final.y"
+#line 203 "final.y"
                         {
 				push(&while_stack, label_count);
 				fprintf(fp, "lb&%d:	", label_count++);
 			}
-#line 1732 "y.tab.c"
+#line 1731 "y.tab.c"
     break;
 
   case 45:
-#line 209 "final.y"
+#line 208 "final.y"
                         {
 				fprintf(fp, "J lb&%d\n", pop(&while_stack));
 				fprintf(fp, "lb&%d:	", pop(&con_stack));
 				printf("Match WHILE\n");
 			}
-#line 1742 "y.tab.c"
+#line 1741 "y.tab.c"
     break;
 
   case 46:
-#line 217 "final.y"
+#line 216 "final.y"
                   {	
-			  fprintf(fp, "I_STORE %d,%s\n", (int)((yyvsp[-3].symp)->value), (yyvsp[-5].str));
+			  fprintf(fp, "I_STORE %s,%s\n", ((yyvsp[-3].symp)->name), (yyvsp[-5].str));
 			  push(&for_stack, label_count);
 			  fprintf(fp, "lb&%d:	", label_count++);
 		  }
-#line 1752 "y.tab.c"
+#line 1751 "y.tab.c"
     break;
 
   case 47:
-#line 223 "final.y"
+#line 222 "final.y"
                   {
 			  fprintf(fp, "INC %s\n", (yyvsp[-8].str));
-			  fprintf(fp, "I_CMP %s,%d\n", (yyvsp[-8].str), (int)((yyvsp[-4].symp)->value));
+			  fprintf(fp, "I_CMP %s,%s\n", (yyvsp[-8].str), ((yyvsp[-4].symp)->name));
 			  fprintf(fp, "JL lb&%d\n", pop(&for_stack));
 		  }
-#line 1762 "y.tab.c"
+#line 1761 "y.tab.c"
     break;
 
 
-#line 1766 "y.tab.c"
+#line 1765 "y.tab.c"
 
       default: break;
     }
@@ -1994,7 +1993,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 229 "final.y"
+#line 228 "final.y"
 
 
 

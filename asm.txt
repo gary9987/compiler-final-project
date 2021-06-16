@@ -5,17 +5,25 @@ Decalre B, Float
 Decalre C, Float
 Decalre D, Float
 Decalre LLL, Float_array,100
-I_STORE 1,I
-lb&1:	I_CMP I, 100
-JG lb&2
-F_ADD 1,1,T&1
-I_STORE T&1,I
-lb&3:	I_CMP I, 100
-JG lb&4
-F_ADD 1,1,T&2
+F_MUL 2,J,T&1
+F_SUB T&1,4,T&2
+F_MUL 100,J,T&3
+F_ADD T&3,6,T&4
 I_STORE T&2,I
-J lb&3
-lb&4:	J lb&1
-lb&2:	HALT testP
+lb&1:	F_UMINUS LLL[I], T&5
+F_MUL B,D,T&6
+F_ADD T&5,T&6,T&7
+F_SUB T&7,C,T&8
+F_STORE T&8,A
+INC I
+I_CMP I,T&4
+JL lb&1
+HALT testP
 Declare T&1, Float
 Declare T&2, Float
+Declare T&3, Float
+Declare T&4, Float
+Declare T&5, Float
+Declare T&6, Float
+Declare T&7, Float
+Declare T&8, Float
