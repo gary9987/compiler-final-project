@@ -2,14 +2,21 @@
 
 ## Folder Structure
 ```bash
-fina_project
+compiler-final-project/
 ├── a.out
 ├── asm.txt
 ├── compile.sh
 ├── final.l # lex code
 ├── final.y # yacc code
 ├── lex.yy.c
-├── testP   # moodle test program
+├── LICENSE.md
+├── Program_Exercise_yacc_2021.pdf
+├── README.md
+├── stack.c # custom stack
+├── stack.h # custom stack
+├── symtab.c # symbol table
+├── symtab.h # symbol table
+├── testP   # test program
 ├── y.tab.c
 └── y.tab.h
 ```

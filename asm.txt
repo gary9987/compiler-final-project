@@ -19,7 +19,19 @@ F_STORE T&8,A
 DEC I
 I_CMP I,T&4
 JL lb&1
-HALT testP
+I_STORE 1,I
+lb&2:	I_CMP I, 100
+JG lb&3
+F_CMP A, 10000.0
+JL lb&4
+F_ADD A,3.14,T&9
+CALL print,T&9
+J lb&5
+lb&4:	CALL print,2,1.4
+lb&5:	I_ADD I,1,T&10
+I_STORE T&10,I
+J lb&2
+lb&3:	HALT testP
 Declare T&1, Integer
 Declare T&2, Integer
 Declare T&3, Integer
@@ -28,3 +40,5 @@ Declare T&5, Float
 Declare T&6, Float
 Declare T&7, Float
 Declare T&8, Float
+Declare T&9, Float
+Declare T&10, Integer
