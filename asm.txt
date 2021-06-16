@@ -18,7 +18,13 @@ F_STORE T&8,A
 INC I
 I_CMP I,T&4
 JL lb&1
-HALT testP
+I_STORE 0,I
+lb&2:	I_CMP I, 100
+JG lb&3
+F_ADD 1,1,T&9
+I_STORE T&9,I
+J lb&2
+lb&3:	HALT testP
 Declare T&1, Float
 Declare T&2, Float
 Declare T&3, Float
@@ -27,3 +33,4 @@ Declare T&5, Float
 Declare T&6, Float
 Declare T&7, Float
 Declare T&8, Float
+Declare T&9, Float
