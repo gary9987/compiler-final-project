@@ -19,6 +19,7 @@
 %{	
 	#define MAX_LENGTH 100
 	#include "symtab.h"
+	#include "stack.h"
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -172,7 +173,8 @@ Assign_Stmt: VarName Assign_Op Expr ';'
 Condition: Expr ConOp Expr	{printf("Match Condition\n");}
 		   {
 			   fprintf(fp, "%s_CMP %s, %s\n", $1->type==1?"I":"F", $1->name, $3->name);
-			   fprintf(fp, "%s lb&%d\n", $2, label_count);
+			   push(&con_stack, label_count);
+			   fprintf(fp, "%s lb&%d\n", $2, label_count++);
 		   }
 		 ;
 ConOp: L_OP {$$ = "JLE";}
@@ -185,12 +187,13 @@ ConOp: L_OP {$$ = "JLE";}
 
 IF_Stmt: IF '(' Condition ')' THEN Stmt_List 
          {
-			fprintf(fp, "J lb&%d\n", label_count);
-			fprintf(fp, "lb&%d:	", label_count++);
+			push(&if_stack, label_count++);
+			fprintf(fp, "J lb&%d\n", top(&if_stack));
+			fprintf(fp, "lb&%d:	", pop(&con_stack));
 		 }
 		 ELSE_Stmt ENDIF
 		 {
-			fprintf(fp, "lb&%d:	", label_count++);
+			fprintf(fp, "lb&%d:	", pop_front(&if_stack));
 		 }
 	   ;
 ELSE_Stmt: ELSE Stmt_List	{printf("Match ELSE_Stmt\n");}
@@ -199,12 +202,13 @@ ELSE_Stmt: ELSE Stmt_List	{printf("Match ELSE_Stmt\n");}
 
 WHILE_Stmt: WHILE 
 			{
+				push(&while_stack, label_count);
 				fprintf(fp, "lb&%d:	", label_count++);
 			}
 			'(' Condition ')' Stmt_List ENDWHILE	
 			{
-				fprintf(fp, "J lb&%d\n", label_count-1);
-				fprintf(fp, "lb&%d:	", label_count++);
+				fprintf(fp, "J lb&%d\n", pop(&while_stack));
+				fprintf(fp, "lb&%d:	", pop(&con_stack));
 				printf("Match WHILE\n");
 			}
 	      ;
@@ -212,20 +216,20 @@ WHILE_Stmt: WHILE
 FOR_Stmt: FOR '(' VarName Assign_Op Expr TO Expr ')' 
 		  {	
 			  fprintf(fp, "I_STORE %d,%s\n", (int)($5->value), $3);
+			  push(&for_stack, label_count);
 			  fprintf(fp, "lb&%d:	", label_count++);
 		  } 
 		  Stmt_List ENDFOR	
 		  {
 			  fprintf(fp, "INC %s\n", $3);
 			  fprintf(fp, "I_CMP %s,%d\n", $3, (int)($7->value));
-			  fprintf(fp, "JL lb&%d\n", label_count-1);
+			  fprintf(fp, "JL lb&%d\n", pop(&for_stack));
 		  }
 		;
 %%
 
 
 int main(){
-
 	memset(symtab, 0, sizeof(symtab));
 	fp = fopen("asm.txt", "w");
 	yyparse();

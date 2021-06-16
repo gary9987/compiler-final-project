@@ -1,3 +1,3 @@
 yacc -d final.y &&
 lex final.l &&
-gcc symtab.c y.tab.c lex.yy.c -ly -lfl
+gcc stack.c symtab.c y.tab.c lex.yy.c -ly -lfl
